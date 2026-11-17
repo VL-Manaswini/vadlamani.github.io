@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lakshmi Manaswini Vadlamani · AI Hardware & VLSI</title>
+<meta name="description" content="Lakshmi Manaswini Vadlamani — prospective ECE PhD student (Fall 2027): energy-efficient AI hardware, VLSI, communications and control.">
+<meta property="og:title" content="Lakshmi Manaswini Vadlamani">
+<meta property="og:description" content="Prospective ECE PhD student · Energy-efficient AI hardware · VLSI">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#06080f; --bg2:#0b1020; --ink:#e8ecf6; --muted:#8b95ad; --line:rgba(140,170,255,.14);
+    --cyan:#3ef0ff; --violet:#a46bff; --pink:#ff5fae; --lime:#8dff9b;
+    --glass:rgba(18,24,44,.55);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.7 "Space Grotesk",system-ui,sans-serif;overflow-x:hidden}
+  a{color:var(--cyan);text-decoration:none}
+  ::selection{background:var(--violet);color:#fff}
+  .mono{font-family:"JetBrains Mono",ui-monospace,monospace}
+
+  /* animated circuit canvas */
+  #circuit{position:fixed;inset:0;width:100%;height:100%;z-index:0;opacity:.85}
+  .glow{position:fixed;width:620px;height:620px;border-radius:50%;filter:blur(120px);z-index:0;pointer-events:none;opacity:.35}
+  .glow.a{background:var(--violet);top:-200px;right:-160px}
+  .glow.b{background:#0aa7c4;bottom:-260px;left:-200px;opacity:.25}
+  main,nav,footer{position:relative;z-index:2}
+
+  nav{position:fixed;top:16px;left:50%;transform:translateX(-50%);display:flex;gap:4px;padding:6px;
+      background:rgba(10,14,28,.7);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:999px;z-index:10;max-width:calc(100% - 24px);overflow-x:auto}
+  nav a{color:var(--muted);font-size:14px;padding:6px 14px;border-radius:999px;white-space:nowrap;transition:.2s}
+  nav a:hover,nav a.active{color:var(--bg);background:var(--cyan)}
+
+  .wrap{max-width:1040px;margin:0 auto;padding:0 24px}
+
+  /* hero */
+  .hero{min-height:100vh;display:grid;grid-template-columns:1.35fr 1fr;align-items:center;gap:48px;padding-top:80px}
+  .eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:13px;color:var(--lime);border:1px solid rgba(141,255,155,.3);
+           padding:6px 14px;border-radius:999px;background:rgba(141,255,155,.06)}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--lime);box-shadow:0 0 0 0 var(--lime);animation:pulse 2s infinite}
+  @keyframes pulse{70%{box-shadow:0 0 0 10px transparent}100%{box-shadow:0 0 0 0 transparent}}
+  h1{font-size:clamp(42px,7vw,82px);line-height:1;margin:22px 0 18px;font-weight:700;letter-spacing:-.03em}
+  h1 .grad{background:linear-gradient(90deg,var(--cyan),var(--violet) 55%,var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent;
+           background-size:200% auto;animation:shine 6s linear infinite}
+  @keyframes shine{to{background-position:200% center}}
+  .typer{font-size:clamp(16px,2vw,20px);color:var(--muted);min-height:1.8em}
+  .typer b{color:var(--cyan);font-weight:500}
+  .caret{display:inline-block;width:10px;height:1.1em;background:var(--cyan);vertical-align:-3px;margin-left:3px;animation:blink 1s steps(1) infinite}
+  @keyframes blink{50%{opacity:0}}
+  .bio{color:#c3cadb;max-width:560px;margin:18px 0 28px}
+  .ctas{display:flex;flex-wrap:wrap;gap:12px}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:11px 20px;border-radius:12px;font-weight:500;font-size:15px;
+       border:1px solid var(--line);color:var(--ink);background:var(--glass);backdrop-filter:blur(8px);transition:.25s}
+  .btn:hover{border-color:var(--cyan);box-shadow:0 0 24px rgba(62,240,255,.25);transform:translateY(-2px)}
+  .btn.primary{background:linear-gradient(90deg,var(--cyan),var(--violet));color:#05070d;border:0}
+  .btn svg{width:18px;height:18px}
+
+  /* chip portrait */
+  .chip{position:relative;aspect-ratio:1;max-width:380px;justify-self:center;width:100%}
+  .chip .die{position:absolute;inset:14%;border-radius:22px;background:linear-gradient(145deg,#141b33,#0a0f1f);
+             border:1px solid rgba(62,240,255,.35);box-shadow:0 0 60px rgba(164,107,255,.25),inset 0 0 40px rgba(62,240,255,.08);overflow:hidden;
+             display:flex;align-items:center;justify-content:center;transform-style:preserve-3d;transition:transform .15s}
+  .chip .die img{width:100%;height:100%;object-fit:cover}
+  .chip .die .ini{font:700 64px "Space Grotesk";background:linear-gradient(135deg,var(--cyan),var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .chip .pins{position:absolute;inset:0}
+  .chip .pins i{position:absolute;background:linear-gradient(var(--cyan),transparent);opacity:.7}
+  .chip .label{position:absolute;bottom:3%;left:0;right:0;text-align:center;font-size:11px;color:var(--muted);letter-spacing:.2em}
+
+  /* sections */
+  section{padding:110px 0 30px}
+  .sec-head{display:flex;align-items:baseline;gap:16px;margin-bottom:36px}
+  .sec-head .num{color:var(--cyan);font-size:14px}
+  h2{font-size:clamp(30px,4vw,44px);margin:0;letter-spacing:-.02em}
+  .sec-head .rule{flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
+
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  .card{position:relative;padding:28px;border-radius:18px;background:var(--glass);border:1px solid var(--line);backdrop-filter:blur(10px);overflow:hidden;transition:.3s}
+  .card::before{content:"";position:absolute;inset:0;background:radial-gradient(400px circle at var(--mx,50%) var(--my,50%),rgba(62,240,255,.14),transparent 40%);opacity:0;transition:.3s}
+  .card:hover::before{opacity:1}
+  .card:hover{transform:translateY(-4px);border-color:rgba(62,240,255,.4)}
+  .card .ico{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;margin-bottom:18px;font-size:22px}
+  .card h3{margin:0 0 10px;font-size:20px}
+  .card p{margin:0;color:var(--muted);font-size:15px}
+  .c1 .ico{background:rgba(62,240,255,.12);color:var(--cyan)}
+  .c2 .ico{background:rgba(164,107,255,.15);color:var(--violet)}
+  .c3 .ico{background:rgba(255,95,174,.13);color:var(--pink)}
+
+  /* stats */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:40px}
+  .stat{padding:22px;border-radius:16px;border:1px solid var(--line);background:rgba(10,14,28,.6);text-align:center}
+  .stat .n{font-size:38px;font-weight:700;background:linear-gradient(90deg,var(--cyan),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .stat .l{font-size:13px;color:var(--muted)}
+
+  /* timeline */
+  .timeline{position:relative;padding-left:34px}
+  .timeline::before{content:"";position:absolute;left:8px;top:6px;bottom:6px;width:2px;background:linear-gradient(var(--cyan),var(--violet),var(--pink));border-radius:2px}
+  .t{position:relative;margin-bottom:26px;padding:22px 24px;border-radius:16px;background:var(--glass);border:1px solid var(--line);backdrop-filter:blur(8px)}
+  .t::before{content:"";position:absolute;left:-32px;top:28px;width:14px;height:14px;border-radius:50%;background:var(--bg);border:2px solid var(--cyan);box-shadow:0 0 12px var(--cyan)}
+  .t .top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  .t h3{margin:0;font-size:19px}
+  .t .when{font-size:13px;color:var(--cyan)}
+  .t .where{color:var(--muted);font-size:15px}
+  .t ul{margin:10px 0 0;padding-left:18px;color:#c3cadb}
+  .roles{margin-top:12px;display:grid;gap:8px}
+  .role{display:flex;justify-content:space-between;gap:12px;padding:10px 14px;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid var(--line);font-size:15px}
+  .role span:last-child{color:var(--muted);font-size:13px;white-space:nowrap}
+  .badge{display:inline-block;font-size:12px;padding:2px 10px;border-radius:999px;background:rgba(141,255,155,.1);color:var(--lime);border:1px solid rgba(141,255,155,.25);margin-left:6px;vertical-align:2px}
+
+  /* skills */
+  .skills{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  .tags{display:flex;flex-wrap:wrap;gap:8px;list-style:none;padding:0;margin:14px 0 0}
+  .tags li{font-size:13px;padding:6px 12px;border-radius:8px;border:1px solid var(--line);background:rgba(255,255,255,.03);transition:.2s}
+  .tags li:hover{border-color:var(--cyan);color:var(--cyan)}
+
+  /* terminal contact */
+  .term{border-radius:16px;overflow:hidden;border:1px solid var(--line);background:#070a14;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+  .term .bar{display:flex;gap:8px;padding:12px 16px;background:#0e1324;border-bottom:1px solid var(--line)}
+  .term .bar i{width:12px;height:12px;border-radius:50%}
+  .term .body{padding:24px;font-size:15px;line-height:2}
+  .term .p{color:var(--lime)} .term .k{color:var(--violet)} .term .s{color:var(--cyan)}
+
+  footer{padding:60px 0 50px;text-align:center;color:var(--muted);font-size:13px}
+
+  .reveal{opacity:0;transform:translateY(28px);transition:opacity .8s ease,transform .8s ease}
+  .reveal.in{opacity:1;transform:none}
+
+  @media (max-width:860px){
+    .hero{grid-template-columns:1fr;padding-top:110px;gap:20px}
+    .chip{max-width:240px;order:-1}
+    .cards,.skills{grid-template-columns:1fr}
+    .stats{grid-template-columns:repeat(2,1fr)}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important}
+    .reveal{opacity:1;transform:none}
+  }
+</style>
+</head>
+<body>
+<canvas id="circuit" aria-hidden="true"></canvas>
+<div class="glow a"></div><div class="glow b"></div>
+
+<nav>
+  <a href="#top">Home</a>
+  <a href="#research">Research</a>
+  <a href="#journey">Journey</a>
+  <a href="#skills">Skills</a>
+  <a href="#contact">Contact</a>
+</nav>
+
+<main class="wrap" id="top">
+
+  <header class="hero">
+    <div>
+      <span class="eyebrow mono"><span class="dot"></span>Seeking a PhD position · Fall 2027</span>
+      <h1>Lakshmi<br><span class="grad">Manaswini</span><br>Vadlamani</h1>
+      <div class="typer mono"><span id="typed"></span><span class="caret"></span></div>
+      <p class="bio">Electronics &amp; communication engineer (Andhra University) with years of production software
+        engineering at Accenture. I want to build <strong>efficient, reliable intelligent systems</strong>, from
+        energy-efficient AI hardware down to the circuits underneath it.</p>
+      <div class="ctas">
+        <a class="btn primary" href="cv.pdf">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0-4-4m4 4 4-4M5 21h14"/></svg>Download CV</a>
+        <!-- Replace YOUR_EMAIL / YOUR-LINKEDIN / YOUR-USERNAME below -->
+        <a class="btn" href="mailto:v.lakshmi.manaswini@gmail.com">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>Email</a>
+        <a class="btn" href="http://www.linkedin.com/in/lakshmi-manaswini-vadlamani-97318a450%20%20">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM3 9h4v12H3zM9 9h3.8v1.7h.05c.53-1 1.83-2.05 3.77-2.05C20.6 8.65 21 11 21 14v7h-4v-6.2c0-1.5 0-3.4-2.07-3.4-2.08 0-2.4 1.6-2.4 3.3V21H9z"/></svg>LinkedIn</a>
+        <a class="btn" href="https://github.com/VL-Manaswini">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.42-2.7 5.4-5.26 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5z"/></svg>GitHub</a>
+      </div>
+    </div>
+
+    <div class="chip" id="chip">
+      <div class="pins" id="pins"></div>
+      <div class="die" id="die">
+        <!-- Add headshot.jpg to this folder to show her photo here -->
+        <img src="headshot.jpg" alt="Lakshmi Manaswini Vadlamani" onerror="this.outerHTML='<span class=&quot;ini&quot;>LMV</span>'">
+      </div>
+      <div class="label mono">LMV-2027 · AI/HW CORE</div>
+    </div>
+  </header>
+
+  <section id="research" class="reveal">
+    <div class="sec-head"><span class="num mono">01</span><h2>Research Interests</h2><span class="rule"></span></div>
+    <div class="cards">
+      <div class="card c1"><div class="ico">⚡</div><h3>VLSI &amp; AI Hardware</h3>
+        <p>Energy-efficient hardware for AI, algorithm–hardware co-design, domain-specific accelerators, agile chip design and low-power VLSI.</p></div>
+      <div class="card c2"><div class="ico">📡</div><h3>Communications</h3>
+        <p>High-capacity optical and wireless (5G/6G) systems and signal processing for communications.</p></div>
+      <div class="card c3"><div class="ico">🤖</div><h3>Autonomy &amp; Control</h3>
+        <p>Decision-making and control under uncertainty, reinforcement learning, and safe autonomy for robots.</p></div>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="n" data-to="10.00" data-dec="2">0</div><div class="l">Final-semester SGPA</div></div>
+      <div class="stat"><div class="n" data-to="8.17" data-dec="2">0</div><div class="l">B.Tech. CGPA / 10</div></div>
+      <div class="stat"><div class="n" data-to="4" data-suf="+">0</div><div class="l">Years at Accenture</div></div>
+      <div class="stat"><div class="n" data-to="3">0</div><div class="l">Engineering internships</div></div>
+    </div>
+  </section>
+
+  <section id="journey" class="reveal">
+    <div class="sec-head"><span class="num mono">02</span><h2>Journey</h2><span class="rule"></span></div>
+    <div class="timeline">
+      <div class="t">
+        <div class="top"><h3>Accenture <span class="badge">current</span></h3><span class="when mono">2022 → now</span></div>
+        <div class="where">Application development · India</div>
+        <div class="roles">
+          <div class="role"><span>Senior Analyst, Application Development</span><span class="mono">2026 – now</span></div>
+          <div class="role"><span>Analyst, Engineering</span><span class="mono">2023 – 2026</span></div>
+          <div class="role"><span>Associate Engineer</span><span class="mono">2022 – 2023</span></div>
+        </div>
+        <!-- Add 2–3 bullets on projects, tech stack and results: <ul><li>...</li></ul> -->
+      </div>
+      <div class="t">
+        <!--  <div class="top"><h3>VLSI Intern · Tech Mahindra</h3><span class="when mono">2020 – 2021</span></div>
+        <div class="where">Chip design internship · India</div>
+      </div>   -->
+      <div class="t">
+        <div class="top"><h3>B.Tech., Electronics &amp; Communication Engineering</h3><span class="when mono">2016 – 2020</span></div>
+        <div class="where">Andhra University, Faculty of Engineering · Visakhapatnam</div>
+        <ul>
+          <li>CGPA 8.17 / 10 (First Class) · perfect 10.00 SGPA in the final semester</li>
+          <li>A+ in VLSI Design, Microprocessors &amp; Microcontrollers, Analog Electronic Circuits, Microwave Engineering</li>
+          <li><strong>Thesis:</strong> Performance Enhancement of DS-CDMA Modem Using BPSK Technique (Grade O, Outstanding). Studied a direct-sequence spread-spectrum modem with BPSK modulation for multi-user communication.</li>
+        </ul>
+      </div>
+      <div class="t">
+        <div class="top"><h3>Intern · Airports Authority of India</h3><span class="when mono">Apr – Jun 2019</span></div>
+        <div class="where">Communication, navigation and surveillance systems</div>
+      </div>
+      <div class="t">
+        <div class="top"><h3>Intern · All India Radio</h3><span class="when mono">Apr – May 2018</span></div>
+        <div class="where">Broadcast transmission systems</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="skills" class="reveal">
+    <div class="sec-head"><span class="num mono">03</span><h2>Toolkit</h2><span class="rule"></span></div>
+    <div class="skills">
+      <div class="card c1"><h3>Hardware &amp; DSP</h3>
+        <ul class="tags mono"><li>HDL design</li><li>Simulation</li><li>VLSI design</li><li>MATLAB</li><li>DSP</li><li>Microcontrollers</li></ul></div>
+      <div class="card c2"><h3>Software</h3>
+        <ul class="tags mono"><li>Enterprise apps</li><li>Production systems</li><!-- add languages, frameworks, cloud --></ul></div>
+      <div class="card c3"><h3>Coursework</h3>
+        <ul class="tags mono"><li>Computer Architecture</li><li>Logic Design</li><li>Digital Comms</li><li>Random Processes</li><li>Control Systems</li><li>Mobile Comms</li></ul></div>
+    </div>
+  </section>
+
+  <section id="contact" class="reveal">
+    <div class="sec-head"><span class="num mono">04</span><h2>Let's talk</h2><span class="rule"></span></div>
+    <div class="term mono">
+      <div class="bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i></div>
+      <div class="body">
+        <div><span class="p">manaswini@phd:~$</span> cat status.txt</div>
+        <div>Looking for a <span class="s">ECE PhD position, Fall 2027</span>: AI hardware · VLSI · ML systems</div>
+        <div><span class="p">manaswini@phd:~$</span> contact --email</div>
+        <div><a href="mailto:v.lakshmi.manaswini@gmail.com">v.lakshmi.manaswini@gmail.com</a></div>
+        <div><span class="p">manaswini@phd:~$</span> open <a href="cv.pdf">cv.pdf</a><span class="caret"></span></div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="mono">© <span id="y"></span> Lakshmi Manaswini Vadlamani · designed with circuits ⚡</footer>
+
+<script>
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+document.getElementById('y').textContent = new Date().getFullYear();
+
+/* typing tagline */
+const lines = ["energy-efficient <b>AI hardware</b>","<b>VLSI</b> & accelerator design","algorithm–hardware <b>co-design</b>","<b>ML systems</b> that run fast"];
+const el = document.getElementById('typed');
+if (reduce) el.innerHTML = "> " + lines[0];
+else (async () => {
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  for (let i = 0;; i = (i + 1) % lines.length) {
+    const plain = lines[i].replace(/<\/?b>/g, '');
+    for (let k = 0; k <= plain.length; k++) { el.textContent = "> " + plain.slice(0, k); await sleep(45); }
+    el.innerHTML = "> " + lines[i]; await sleep(1800);
+    for (let k = plain.length; k >= 0; k--) { el.textContent = "> " + plain.slice(0, k); await sleep(22); }
+    await sleep(250);
+  }
+})();
+
+/* circuit-board background with traveling signals */
+const cv = document.getElementById('circuit'), cx = cv.getContext('2d');
+let W, H, traces = [], pulses = [];
+const G = 28;
+function build() {
+  const d = devicePixelRatio || 1;
+  W = cv.width = innerWidth * d; H = cv.height = innerHeight * d;
+  cx.setTransform(1,0,0,1,0,0); cx.scale(d, d);
+  traces = [];
+  const n = Math.round(innerWidth * innerHeight / 22000);
+  for (let i = 0; i < n; i++) {
+    let x = Math.round(Math.random() * innerWidth / G) * G, y = Math.round(Math.random() * innerHeight / G) * G;
+    const pts = [[x, y]]; let dir = Math.floor(Math.random() * 4);
+    const segs = 2 + Math.floor(Math.random() * 4);
+    for (let s = 0; s < segs; s++) {
+      const len = G * (1 + Math.floor(Math.random() * 5));
+      const dx = [1,0,-1,0][dir], dy = [0,1,0,-1][dir];
+      x += dx * len; y += dy * len; pts.push([x, y]);
+      dir = (dir + (Math.random() < .5 ? 1 : 3)) % 4;
+    }
+    traces.push(pts);
+  }
+}
+function pathLen(p){let L=0;for(let i=1;i<p.length;i++)L+=Math.abs(p[i][0]-p[i-1][0])+Math.abs(p[i][1]-p[i-1][1]);return L}
+function pointAt(p,t){for(let i=1;i<p.length;i++){const l=Math.abs(p[i][0]-p[i-1][0])+Math.abs(p[i][1]-p[i-1][1]);if(t<=l){const f=l?t/l:0;return[p[i-1][0]+(p[i][0]-p[i-1][0])*f,p[i-1][1]+(p[i][1]-p[i-1][1])*f]}t-=l}return p[p.length-1]}
+const colors = ['62,240,255','164,107,255','255,95,174'];
+function frame() {
+  cx.clearRect(0, 0, innerWidth, innerHeight);
+  cx.lineWidth = 1;
+  for (const p of traces) {
+    cx.strokeStyle = 'rgba(120,150,230,.10)';
+    cx.beginPath(); cx.moveTo(p[0][0], p[0][1]); for (const q of p.slice(1)) cx.lineTo(q[0], q[1]); cx.stroke();
+    for (const e of [p[0], p[p.length-1]]) { cx.fillStyle='rgba(120,150,230,.22)'; cx.beginPath(); cx.arc(e[0], e[1], 2.4, 0, 7); cx.fill(); }
+  }
+  if (!reduce) {
+    if (pulses.length < 26 && Math.random() < .25) {
+      const p = traces[Math.floor(Math.random()*traces.length)];
+      pulses.push({p, t:0, L:pathLen(p), v:1.2+Math.random()*2, c:colors[Math.floor(Math.random()*3)]});
+    }
+    pulses = pulses.filter(s => s.t < s.L);
+    for (const s of pulses) {
+      s.t += s.v;
+      for (let k = 0; k < 14; k++) {
+        const [x, y] = pointAt(s.p, Math.max(0, s.t - k * 3));
+        cx.fillStyle = `rgba(${s.c},${(1 - k/14) * .9})`;
+        cx.beginPath(); cx.arc(x, y, k ? 1.6 : 2.6, 0, 7); cx.fill();
+      }
+    }
+    requestAnimationFrame(frame);
+  }
+}
+build(); frame();
+addEventListener('resize', () => { build(); if (reduce) frame(); });
+
+/* chip pins + tilt */
+const pins = document.getElementById('pins');
+for (let side = 0; side < 4; side++) for (let i = 0; i < 7; i++) {
+  const s = document.createElement('i'), pos = 22 + i * 9.3 + '%';
+  if (side === 0) Object.assign(s.style, {left:pos, top:'2%', width:'2px', height:'12%'});
+  if (side === 1) Object.assign(s.style, {left:pos, bottom:'2%', width:'2px', height:'12%', transform:'rotate(180deg)'});
+  if (side === 2) Object.assign(s.style, {top:pos, left:'2%', height:'2px', width:'12%', background:'linear-gradient(90deg,var(--cyan),transparent)'});
+  if (side === 3) Object.assign(s.style, {top:pos, right:'2%', height:'2px', width:'12%', background:'linear-gradient(270deg,var(--cyan),transparent)'});
+  pins.appendChild(s);
+}
+const chip = document.getElementById('chip'), die = document.getElementById('die');
+if (!reduce) {
+  chip.addEventListener('mousemove', e => { const r = chip.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
+    die.style.transform = `perspective(700px) rotateY(${x*18}deg) rotateX(${-y*18}deg)`; });
+  chip.addEventListener('mouseleave', () => die.style.transform = '');
+}
+
+/* card spotlight */
+document.querySelectorAll('.card').forEach(c => c.addEventListener('mousemove', e => {
+  const r = c.getBoundingClientRect(); c.style.setProperty('--mx', e.clientX - r.left + 'px'); c.style.setProperty('--my', e.clientY - r.top + 'px'); }));
+
+/* reveal + counters + active nav */
+const countUp = n => { const to = +n.dataset.to, dec = +(n.dataset.dec || 0), suf = n.dataset.suf || ''; let t0;
+  const step = ts => { t0 ??= ts; const f = Math.min(1, (ts - t0) / 1400), v = to * (1 - Math.pow(1 - f, 3));
+    n.textContent = v.toFixed(dec) + suf; if (f < 1) requestAnimationFrame(step); };
+  reduce ? n.textContent = to.toFixed(dec) + suf : requestAnimationFrame(step); };
+const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) {
+  e.target.classList.add('in'); e.target.querySelectorAll('.n').forEach(countUp); io.unobserve(e.target); } }), {threshold:.15});
+document.querySelectorAll('.reveal').forEach(s => io.observe(s));
+const links = [...document.querySelectorAll('nav a')];
+addEventListener('scroll', () => { let cur = 'top';
+  document.querySelectorAll('section[id]').forEach(s => { if (s.getBoundingClientRect().top < innerHeight * .4) cur = s.id; });
+  links.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + cur)); }, {passive:true});
+</script>
+</body>
+</html>
